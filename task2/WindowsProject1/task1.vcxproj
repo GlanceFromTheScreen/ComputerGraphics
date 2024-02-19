@@ -125,8 +125,12 @@
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetDir)$(ProjectName).exe" "$(SolutionDir)$(ProjectName).exe"</Command>
+      <Command>copy "$(ProjectDir)vShader.hlsl" "$(OutDir)vShader.hlsl"
+copy "$(ProjectDir)pShader.hlsl" "$(OutDir)pShader.hlsl"</Command>
     </PostBuildEvent>
+    <FxCompile>
+      <AdditionalIncludeDirectories>C:\Users\Le\Desktop\AppMath\CG\github\task2\WindowsProject1</AdditionalIncludeDirectories>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
