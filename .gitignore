@@ -1,4 +1,5 @@
 task1/WindowsProject1/.vs/
+task2/WindowsProject1/.vs/
 *.db
 *.db-shm
 *.db-wal
