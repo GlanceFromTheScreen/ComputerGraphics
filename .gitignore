@@ -1,6 +1,8 @@
 task1/WindowsProject1/.vs/
 task2/WindowsProject1/.vs/
-task3/WindowsProject1/.vs/
+task3/.vs/
+task4/.vs/
+task4/Computer_graphics_1/x64
 *.db
 *.db-shm
 *.db-wal
