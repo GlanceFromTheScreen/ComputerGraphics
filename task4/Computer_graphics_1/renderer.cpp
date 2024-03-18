@@ -304,14 +304,14 @@ bool Renderer::deviceInit(HINSTANCE hinst, HWND hWnd, Camera* pCamera, Input* pI
 }
 
 void Renderer::inputMovement() {
-  XMFLOAT3 mouseMove = m_pInput->getMouseState();
+  XMFLOAT3 mouseMove = m_pInput->GetMouseMove();
   m_pCamera->getMouseState(mouseMove.x, mouseMove.y, mouseMove.z);
 }
 
 bool Renderer::getState() {
   HRESULT hr = S_OK;
   m_pCamera->getState();
-  m_pInput->getState();
+  //m_pInput->getState();
 
   inputMovement();
 

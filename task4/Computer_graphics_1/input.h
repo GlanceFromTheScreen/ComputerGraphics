@@ -1,34 +1,29 @@
 #pragma once
 
-#define DIRECTINPUT_VERSION 0x0800
 
-#pragma comment(lib, "dinput8.lib")
+
 #pragma comment(lib, "dxguid.lib")
-
-#include <dinput.h>
 #include <directxmath.h>
 #include <windows.h>
 
 using namespace DirectX;
 
 class Input {
-private:
-    bool readKB();
-    bool readMouse();
-    HINSTANCE m_hinst;
-    HWND m_hwnd;
-    int m_screenW;
-    int m_screenH;
-    bool m_state;
-    XMFLOAT3 m_mouseState;
-    XMFLOAT3 prevMouseState = XMFLOAT3(0.0f, 0.0f, 0.0f);
-
 public:
-    Input(HINSTANCE hinst, HWND hwnd, int screenW, int screenH);
-    ~Input();
-    bool getState();
+	int lastMouseX = 0;
+	int lastMouseY = 0;
+	Input(HINSTANCE hinst, HWND hwnd, int screenW, int screenH);
+	int m_screenW = 0, m_screenH = 0;
+	BYTE keyState[256];
+	void resize(int screenW, int screenH);
+	bool IsLeftPressed();
+	bool IsRightPressed();
+	bool IsUpPressed();
+	bool IsDownPressed();
+	int GetZoom();
+	XMFLOAT3 GetMouseMove();
 
-    XMFLOAT3 getMouseState();
+private:
+	bool IsMouseButtonPressed();
 
-    void resize(int screenW, int screenH);
 };
