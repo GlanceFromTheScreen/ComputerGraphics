@@ -17,6 +17,12 @@ struct Vertex {
   float u, v;
 };
 
+
+struct AuxRect {
+    XMFLOAT3 v[4];
+};
+
+
 struct WorldMatrixBuffer {
   XMMATRIX mWorldMatrix;
 };
@@ -90,6 +96,7 @@ private:
   float m_rightSpeed = 0.0f;
   float m_frameMove = 0.001f;
   XMFLOAT3 m_cubePos = XMFLOAT3(0.0f, 0.0f, 0.0f);
+  AuxRect aux_rects[2];
 
   HRESULT setupBackBuffer();
   HRESULT initScene();

@@ -3,6 +3,8 @@
 #include <array>
 #include "renderer.h"
 
+float computeDistanceSqr(const XMFLOAT3& vec1, const XMFLOAT3& vec2);
+
 namespace {
   static const Vertex Vertices[] = {
          {-0.5, -0.5,  0.5, 0, 1},
@@ -95,6 +97,14 @@ HRESULT Renderer::setupBackBuffer() {
 }
 
 HRESULT Renderer::initScene() {
+
+    for (int i = 0; i < 4; i++)
+    {
+        aux_rects[0].v[i] = XMFLOAT3{ coloredPlaneVertices[i].x, coloredPlaneVertices[i].y, coloredPlaneVertices[i].z };
+        aux_rects[1].v[i] = XMFLOAT3{ coloredPlaneVertices[i].x, coloredPlaneVertices[i].y, coloredPlaneVertices[i].z };
+    }
+
+
   HRESULT hr = S_OK;
 
   static const D3D11_INPUT_ELEMENT_DESC InputDesc[] = {
@@ -632,15 +642,38 @@ bool Renderer::render() {
   m_pDeviceContext->OMSetBlendState(m_pTransparentBlendState, NULL, 0xFFFFFFFF);
   m_pDeviceContext->OMSetDepthStencilState(m_pTransparentDepthState, 0);
 
-  m_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer);
-  m_pDeviceContext->PSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer);
+  //
+  float dist1 = 0.0f, dist2 = 0.0f;
+  XMFLOAT3 cameraPos = m_pCamera->getPosition();
+
+  for (int i = 0; i < 4; i++) {
+      dist1 = max(dist1, computeDistanceSqr(cameraPos, aux_rects[0].v[i]));
+      dist2 = max(dist2, computeDistanceSqr(cameraPos, aux_rects[1].v[i]));
+  }
+
   m_pDeviceContext->VSSetConstantBuffers(1, 1, &m_pTransparentSceneBuffer);
   m_pDeviceContext->PSSetShader(m_pTransparentPixelShader, NULL, 0);
-  m_pDeviceContext->DrawIndexed(static_cast<UINT>(coloredPlaneIndices.size()), 0, 0);
 
-  m_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer1);
-  m_pDeviceContext->PSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer1);
-  m_pDeviceContext->DrawIndexed(static_cast<UINT>(coloredPlaneIndices.size()), 0, 0);
+  if (dist1 < dist2) {
+      m_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer);
+      m_pDeviceContext->PSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer);
+      m_pDeviceContext->DrawIndexed(static_cast<UINT>(coloredPlaneIndices.size()), 0, 0);
+
+      m_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer1);
+      m_pDeviceContext->PSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer1);
+      m_pDeviceContext->DrawIndexed(static_cast<UINT>(coloredPlaneIndices.size()), 0, 0);
+  }
+
+  else {
+      m_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer1);
+      m_pDeviceContext->PSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer1);
+      m_pDeviceContext->DrawIndexed(static_cast<UINT>(coloredPlaneIndices.size()), 0, 0);
+
+      m_pDeviceContext->VSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer);
+      m_pDeviceContext->PSSetConstantBuffers(0, 1, &m_pTransparentWorldBuffer);
+      m_pDeviceContext->DrawIndexed(static_cast<UINT>(coloredPlaneIndices.size()), 0, 0);
+  }
+
 
   HRESULT hr = m_pSwapChain->Present(1, 0);
   assert(SUCCEEDED(hr));
@@ -708,4 +741,14 @@ bool Renderer::winResize(UINT width, UINT height) {
     return SUCCEEDED(hr);
   }
   return true;
+}
+
+float computeDistanceSqr(const XMFLOAT3& vec1, const XMFLOAT3& vec2) {
+    XMVECTOR v1 = XMLoadFloat3(&vec1);
+    XMVECTOR v2 = XMLoadFloat3(&vec2);
+    XMVECTOR diff = v1 - v2;
+    XMVECTOR distSqr = XMVector3LengthSq(diff);
+    float distanceSqr;
+    XMStoreFloat(&distanceSqr, distSqr);
+    return distanceSqr;
 }
